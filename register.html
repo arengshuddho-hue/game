@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="reg_title">Join · The Detective's Desk</title>
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body class="auth">
+
+  <div class="auth-box">
+    <div class="lang-bar">
+      <button type="button" class="theme-toggle" aria-label="Switch Theme">☀</button>
+      <div class="lang-switch">
+        <button type="button" class="lang-btn" onclick="setLanguage('en')">EN</button>
+        <button type="button" class="lang-btn" onclick="setLanguage('bn')">বাংলা</button>
+      </div>
+    </div>
+
+    <a class="brand" href="index.html" style="justify-content: center; margin-bottom: 8px;">
+      <span class="icon">🕵️</span> <span data-i18n="title">The Detective's Desk</span>
+    </a>
+
+    <p class="stamp" style="font-size: 0.8rem; padding: 4px 14px; margin-bottom: 16px;">NEW PERSONNEL DOSSIER</p>
+
+    <h1 data-i18n="reg_heading" style="font-size: 1.8rem;">Open your file</h1>
+    <p class="muted" data-i18n="reg_sub">Create an account to start investigating.</p>
+
+    <div id="err-msg" class="err" style="display: none;"></div>
+
+    <form id="reg-form" autocomplete="off">
+      <label>
+        <span data-i18n="lbl_username">Username</span>
+        <input type="text" name="username" id="username" required autofocus placeholder="e.g. sherlock_holmes">
+      </label>
+
+      <label>
+        <span data-i18n="lbl_email">Email</span>
+        <input type="email" name="email" id="email" required placeholder="detective@desk.noir">
+      </label>
+
+      <label>
+        <span data-i18n="lbl_password">Password</span>
+        <input type="password" name="password" id="password" required minlength="6" placeholder="Min 6 characters">
+      </label>
+
+      <button class="btn" type="submit" id="submit-btn" style="width: 100%; margin-top: 10px;" data-i18n="btn_create_acc">
+        Create account
+      </button>
+
+      <p class="muted" style="margin-top: 20px;">
+        <span data-i18n="already_acc">Already have an account?</span>
+        <a href="login.html" data-i18n="sign_in">Sign in</a>
+      </p>
+    </form>
+  </div>
+
+  <script src="js/lang.js"></script>
+  <script>
+    const form = document.getElementById('reg-form');
+    const errBox = document.getElementById('err-msg');
+    const submitBtn = document.getElementById('submit-btn');
+
+    const clickSound = new Audio('assets/audio/click.mp3');
+    function playClick() {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(() => {});
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      playClick();
+      errBox.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enrolling in bureau...';
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          if (data.token) localStorage.setItem('detective_jwt', data.token);
+          if (data.user) localStorage.setItem('detective_user', JSON.stringify(data.user));
+          window.location.href = 'game.html';
+        } else {
+          const currentLang = localStorage.getItem('preferredLang') || 'en';
+          const errorKey = data.errorKey || 'err_server';
+          errBox.textContent = (translations[currentLang] && translations[currentLang][errorKey]) || data.error || 'Registration failed';
+          errBox.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = (translations[currentLang] && translations[currentLang]['btn_create_acc']) || 'Create account';
+        }
+      } catch (err) {
+        errBox.textContent = 'Connection error. Please try again.';
+        errBox.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create account';
+      }
+    });
+  </script>
+</body>
+</html>
+

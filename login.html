@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="login_title">Sign in · The Detective's Desk</title>
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body class="auth">
+
+  <div class="auth-box">
+    <div class="lang-bar">
+      <button type="button" class="theme-toggle" aria-label="Switch Theme">☀</button>
+      <div class="lang-switch">
+        <button type="button" class="lang-btn" onclick="setLanguage('en')">EN</button>
+        <button type="button" class="lang-btn" onclick="setLanguage('bn')">বাংলা</button>
+      </div>
+    </div>
+
+    <a class="brand" href="index.html" style="justify-content: center; margin-bottom: 8px;">
+      <span class="icon">🕵️</span> <span data-i18n="title">The Detective's Desk</span>
+    </a>
+    
+    <p class="stamp" style="font-size: 0.8rem; padding: 4px 14px; margin-bottom: 16px;">CONFIDENTIAL ACCESS</p>
+    
+    <h1 data-i18n="login_heading" style="font-size: 1.8rem;">Welcome back, detective</h1>
+    <p class="muted" data-i18n="login_sub">Your case file is waiting for you.</p>
+
+    <div id="err-msg" class="err" style="display: none;"></div>
+
+    <form id="login-form">
+      <label>
+        <span data-i18n="lbl_identity">Username or email</span>
+        <input type="text" name="identity" id="identity" required autofocus placeholder="e.g. detective or email">
+      </label>
+
+      <label>
+        <span data-i18n="lbl_password">Password</span>
+        <input type="password" name="password" id="password" required placeholder="••••••••">
+      </label>
+
+      <button class="btn" type="submit" id="submit-btn" style="width: 100%; margin-top: 10px;" data-i18n="btn_signin">
+        Sign in
+      </button>
+
+      <!-- 1-Click Instant Demo Detective Button -->
+      <button class="btn ghost" type="button" id="demo-btn" style="width: 100%; margin-top: 10px; border-style: dashed;" data-i18n="btn_demo_login">
+        ⚡ Instant Demo Detective (1-Click)
+      </button>
+
+      <p class="muted" style="margin-top: 20px;">
+        <span data-i18n="new_here">New here?</span>
+        <a href="register.html" data-i18n="create_acc">Create an account</a>
+      </p>
+    </form>
+  </div>
+
+  <script src="js/lang.js"></script>
+  <script>
+    const form = document.getElementById('login-form');
+    const errBox = document.getElementById('err-msg');
+    const submitBtn = document.getElementById('submit-btn');
+    const demoBtn = document.getElementById('demo-btn');
+
+    // Click sound effect
+    const clickSound = new Audio('assets/audio/click.mp3');
+    function playClick() {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(() => {});
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      playClick();
+      errBox.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Verifying credentials...';
+
+      const identity = document.getElementById('identity').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identity, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          if (data.token) localStorage.setItem('detective_jwt', data.token);
+          if (data.user) localStorage.setItem('detective_user', JSON.stringify(data.user));
+          window.location.href = 'game.html';
+        } else {
+          const currentLang = localStorage.getItem('preferredLang') || 'en';
+          const errorKey = data.errorKey || 'err_login';
+          errBox.textContent = (translations[currentLang] && translations[currentLang][errorKey]) || data.error || 'Login failed';
+          errBox.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = (translations[currentLang] && translations[currentLang]['btn_signin']) || 'Sign in';
+        }
+      } catch (err) {
+        errBox.textContent = 'Connection error. Please try again.';
+        errBox.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign in';
+      }
+    });
+
+    demoBtn.addEventListener('click', async () => {
+      playClick();
+      demoBtn.disabled = true;
+      demoBtn.textContent = 'Preparing demo dossier...';
+      try {
+        const res = await fetch('/api/demo', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          if (data.token) localStorage.setItem('detective_jwt', data.token);
+          if (data.user) localStorage.setItem('detective_user', JSON.stringify(data.user));
+          window.location.href = 'game.html';
+        } else {
+          window.location.href = 'game.html';
+        }
+      } catch (err) {
+        window.location.href = 'game.html';
+      }
+    });
+  </script>
+</body>
+</html>
+

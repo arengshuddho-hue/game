@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="title">The Detective's Desk · Noir Mystery Game</title>
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <span class="icon">🕵️</span> <span data-i18n="title">The Detective's Desk</span>
+    </a>
+
+    <button class="theme-toggle" type="button" aria-label="Switch Theme">☀</button>
+
+    <div class="lang-switch">
+      <button class="lang-btn" type="button" onclick="setLanguage('en')">EN</button>
+      <button class="lang-btn" type="button" onclick="setLanguage('bn')">বাংলা</button>
+    </div>
+
+    <!-- Auth dynamic slot -->
+    <div id="nav-auth-slot" style="display: inline-flex; align-items: center; gap: 10px;">
+      <a href="login.html" data-i18n="sign_in">Sign in</a>
+      <a class="btn" href="register.html" data-i18n="join">Join Bureau</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div>
+      <p class="stamp" data-i18n="case_open">Classified Case Dossier</p>
+      <h1 data-i18n="hero_heading">Every crime leaves a trace. Can you crack the case?</h1>
+      <p class="lead" data-i18n="hero_lead">
+        Search archival crime scenes, interrogate persons of interest, and indict the culprit before the trail goes cold.
+      </p>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <a class="btn big" href="game.html" data-i18n="btn_start">Begin Investigation</a>
+        <button class="btn big ghost" id="hero-demo-btn" type="button" data-i18n="btn_demo">⚡ Try Demo Case File</button>
+      </div>
+
+      <p class="muted" style="text-align: left; font-size: 0.88rem;">
+        🔒 Fully equipped with serverless database storage, Noir soundtrack, and multi-case investigation.
+      </p>
+    </div>
+
+    <div>
+      <img src="assets/img/hero-desk.png" alt="A detective's desk covered in crime scene files, magnifying glass and evidence">
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="wrap" style="margin-top: 0;">
+    <h2 data-i18n="how_it_works">Standard Investigative Protocol</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 24px;">
+      <div class="card" style="margin:0;">
+        <span style="font-size: 2rem;">🔍</span>
+        <h3 data-i18n="step_1_title" style="margin-top: 10px;">1. Inspect Crime Scenes</h3>
+        <p class="muted" style="text-align: left; margin:0;" data-i18n="step_1_desc">Discover glowing evidentiary hotspots to bag forensic clues.</p>
+      </div>
+      <div class="card" style="margin:0;">
+        <span style="font-size: 2rem;">🎙️</span>
+        <h3 data-i18n="step_2_title" style="margin-top: 10px;">2. Interrogate Suspects</h3>
+        <p class="muted" style="text-align: left; margin:0;" data-i18n="step_2_desc">Press alibis, spot inconsistencies, and break their defense.</p>
+      </div>
+      <div class="card" style="margin:0;">
+        <span style="font-size: 2rem;">⚖️</span>
+        <h3 data-i18n="step_3_title" style="margin-top: 10px;">3. Issue the Indictment</h3>
+        <p class="muted" style="text-align: left; margin:0;" data-i18n="step_3_desc">Present your formal arrest warrant and prove the true motive.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Available Cases Showcase -->
+  <section class="wrap">
+    <h2>Available Case Dossiers</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 20px;">
+      <div class="note" style="margin:0;">
+        <span class="pill" style="margin-bottom: 8px;">Case #1 · Rialto</span>
+        <b>The Silent Projector Incident</b>
+        <p class="muted" style="text-align:left; font-size:0.85rem; margin:6px 0 0;">Blackout demonstration and damaged film machinery.</p>
+      </div>
+      <div class="note" style="margin:0;">
+        <span class="pill" style="margin-bottom: 8px;">Case #2 · Box Office</span>
+        <b>The Missing Ticket Money</b>
+        <p class="muted" style="text-align:left; font-size:0.85rem; margin:6px 0 0;">An intact safe, missing combinations, and empty lockboxes.</p>
+      </div>
+      <div class="note" style="margin:0;">
+        <span class="pill" style="margin-bottom: 8px;">Case #3 · Backstage</span>
+        <b>The Falling Flat</b>
+        <p class="muted" style="text-align:left; font-size:0.85rem; margin:6px 0 0;">A heavy wooden scenery flat cleanly cut with a knife.</p>
+      </div>
+      <div class="note" style="margin:0;">
+        <span class="pill" style="margin-bottom: 8px;">Case #4 · Office</span>
+        <b>The Bitter Espresso</b>
+        <p class="muted" style="text-align:left; font-size:0.85rem; margin:6px 0 0;">Drugged evening coffee and an impending termination meeting.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="foot muted" data-i18n="footer">
+    The Detective's Desk · Noir Mystery Interactive Experience · Ready for Vercel
+  </footer>
+
+  <script src="js/lang.js"></script>
+  <script>
+    // Check if user is already logged in
+    (async function checkUserSession() {
+      try {
+        const res = await fetch('/api/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated && data.user) {
+            const slot = document.getElementById('nav-auth-slot');
+            if (slot) {
+              slot.innerHTML = `
+                <a class="btn" href="game.html">🕵️ Open File (${data.user.username})</a>
+                <a class="btn ghost" href="/api/logout">Sign out</a>
+              `;
+            }
+          }
+        }
+      } catch (e) {}
+    })();
+
+    // 1-Click Demo Login
+    const demoBtn = document.getElementById('hero-demo-btn');
+    if (demoBtn) {
+      demoBtn.addEventListener('click', async () => {
+        demoBtn.textContent = 'Opening Case File...';
+        try {
+          const res = await fetch('/api/demo', { method: 'POST' });
+          const data = await res.json();
+          if (data.success && data.user) {
+            localStorage.setItem('detective_user', JSON.stringify(data.user));
+            if (data.token) localStorage.setItem('detective_jwt', data.token);
+          }
+          window.location.href = 'game.html';
+        } catch (e) {
+          window.location.href = 'game.html';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/login.php",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/register.html"
+    },
+    {
+      "source": "/register.php",
+      "destination": "/register.html"
+    },
+    {
+      "source": "/game",
+      "destination": "/game.html"
+    },
+    {
+      "source": "/game.php",
+      "destination": "/game.html"
+    },
+    {
+      "source": "/logout",
+      "destination": "/api/logout"
+    },
+    {
+      "source": "/logout.php",
+      "destination": "/api/logout"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
+

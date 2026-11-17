@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="game_title">Case File · The Detective's Desk</title>
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body data-uid="1">
+
+  <!-- Top Navigation & Control Center -->
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <span class="icon">🕵️</span> <span data-i18n="title">The Detective's Desk</span>
+    </a>
+
+    <!-- Audio Master Center -->
+    <div class="audio-ctrl" title="Ambient Music & SFX">
+      <button class="audio-btn" id="btn-toggle-music" type="button" aria-label="Toggle Background Music">
+        <span id="music-icon">🎵</span>
+      </button>
+      <div class="equalizer" id="audio-eq">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <button class="audio-btn" id="btn-toggle-sfx" type="button" aria-label="Toggle SFX">
+        <span id="sfx-icon">🔔</span>
+      </button>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" type="button" aria-label="Switch Theme">☀</button>
+
+    <!-- Language Switch -->
+    <div class="lang-switch">
+      <button class="lang-btn" type="button" onclick="setLanguage('en');">EN</button>
+      <button class="lang-btn" type="button" onclick="setLanguage('bn');">বাংলা</button>
+    </div>
+
+    <!-- Live Score Pill -->
+    <span class="pill">
+      <span>🏆</span> <span data-i18n="score_label">Score:</span> <span id="score">0</span>
+    </span>
+
+    <!-- Detective Badge & Profile -->
+    <div class="detective-badge">
+      <span id="det-rank-badge">🔍</span>
+      <span class="muted" style="margin:0;"><span data-i18n="detective_label">Inspector</span>: <b id="detective-name">Detective</b></span>
+    </div>
+
+    <!-- Leaderboard Button -->
+    <button class="btn ghost" id="btn-leaderboard" type="button" style="padding: 6px 12px; font-size: 0.8rem;">
+      📊 <span data-i18n="leaderboard_btn">Records</span>
+    </button>
+
+    <a class="btn ghost" href="/api/logout" id="logout-link" data-i18n="sign_out">Sign out</a>
+  </header>
+
+  <!-- Main Case File Container -->
+  <main class="wrap">
+
+    <!-- Case Selector Bar -->
+    <div class="case-selector" id="case-selector-bar">
+      <!-- Injected dynamically by game.js -->
+    </div>
+
+    <p class="stamp" id="case-stamp" data-i18n="case_file">Case file</p>
+    <h1 id="case-title" data-i18n="the_case">The Case</h1>
+
+    <!-- Dossier Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="scene">
+        <span>🔍</span> <span data-i18n="tab_scene">Scene</span>
+      </button>
+      <button class="tab" data-tab="suspects">
+        <span>👥</span> <span data-i18n="tab_suspects">Suspects</span>
+      </button>
+      <button class="tab" data-tab="evidence">
+        <span>📦</span> <span data-i18n="tab_evidence">Evidence</span>
+      </button>
+      <button class="tab" data-tab="timeline">
+        <span>⏱️</span> <span data-i18n="tab_timeline">Timeline</span>
+      </button>
+      <button class="tab" data-tab="accuse">
+        <span>⚖️</span> <span data-i18n="tab_accuse">Accuse</span>
+      </button>
+    </nav>
+
+    <!-- Panels -->
+    <section class="panel" id="tab-scene">
+      <h2 data-i18n="tab_scene">Scene</h2>
+      <p class="muted" data-i18n="panel_scene_desc">Crime scenes will appear here.</p>
+    </section>
+
+    <section class="panel" id="tab-suspects" hidden>
+      <h2 data-i18n="tab_suspects">Suspects</h2>
+      <p class="muted" data-i18n="panel_suspects_desc">Suspects and interviews will appear here.</p>
+    </section>
+
+    <section class="panel" id="tab-evidence" hidden>
+      <h2 data-i18n="tab_evidence">Evidence</h2>
+      <p class="muted" data-i18n="panel_evidence_desc">Collected evidence will appear here.</p>
+    </section>
+
+    <section class="panel" id="tab-timeline" hidden>
+      <h2 data-i18n="tab_timeline">Timeline</h2>
+      <p class="muted" data-i18n="panel_timeline_desc">The timeline of events will appear here.</p>
+    </section>
+
+    <section class="panel" id="tab-accuse" hidden>
+      <h2 data-i18n="tab_accuse">Accuse</h2>
+      <p class="muted" data-i18n="panel_accuse_desc">Name the criminal and the motive here.</p>
+    </section>
+  </main>
+
+  <!-- Floating Desk Tools Bar -->
+  <div class="desk-tools">
+    <button class="btn ghost" id="btn-notepad">
+      📝 <span data-i18n="btn_notepad">Notepad</span>
+    </button>
+    <button class="btn ghost" id="btn-cork">
+      📌 <span data-i18n="btn_cork">Corkboard</span> <span class="pill" id="cork-count" style="margin-left: 4px; padding: 2px 8px; font-size: 0.75rem;">0</span>
+    </button>
+  </div>
+
+  <!-- Notepad Drawer -->
+  <aside class="drawer" id="drawer-notepad" hidden>
+    <div class="drawer-head">
+      <h3 data-i18n="notepad_title">Detective notepad</h3>
+      <button class="btn ghost" data-close data-i18n="btn_close">Close</button>
+    </div>
+    <textarea id="notepad" data-i18n-placeholder="notepad_placeholder" placeholder="Write your theories, times and names here..."></textarea>
+    <p class="muted" data-i18n="notepad_saved">Saved automatically in this browser.</p>
+  </aside>
+
+  <!-- Corkboard Drawer -->
+  <aside class="drawer" id="drawer-cork" hidden>
+    <div class="drawer-head">
+      <h3 data-i18n="evidence_board">Evidence corkboard</h3>
+      <button class="btn ghost" data-close data-i18n="btn_close">Close</button>
+    </div>
+    <div class="cork" id="cork-board"></div>
+  </aside>
+
+  <!-- Leaderboard Drawer -->
+  <aside class="drawer" id="drawer-leaderboard" hidden>
+    <div class="drawer-head">
+      <h3 data-i18n="leaderboard_title">Bureau Records & High Scores</h3>
+      <button class="btn ghost" data-close data-i18n="btn_close">Close</button>
+    </div>
+    <div id="leaderboard-content" style="flex:1; overflow-y:auto; padding-top: 10px;">
+      <p class="muted">Loading bureau archives...</p>
+    </div>
+  </aside>
+
+  <!-- Auth Check & Bootstrap Script -->
+  <script>
+    (async function checkAuth() {
+      try {
+        const res = await fetch('/api/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated && data.user) {
+            document.body.dataset.uid = data.user.id;
+            document.getElementById('detective-name').textContent = data.user.username;
+            localStorage.setItem('detective_user', JSON.stringify(data.user));
+            return;
+          }
+        }
+      } catch (e) {
+        // Fallback to local storage if API unreachable during static preview
+      }
+
+      const cached = localStorage.getItem('detective_user');
+      if (cached) {
+        try {
+          const u = JSON.parse(cached);
+          document.body.dataset.uid = u.id || 1;
+          document.getElementById('detective-name').textContent = u.username || 'Detective';
+          return;
+        } catch (e) {}
+      }
+
+      // If no session exists, redirect to login
+      window.location.href = 'login.html';
+    })();
+  </script>
+
+  <!-- Game Scripts -->
+  <script src="js/lang.js"></script>
+  <script src="js/case-data.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/tools.js"></script>
+</body>
+</html>
+
