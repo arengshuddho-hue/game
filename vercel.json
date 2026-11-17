@@ -1,37 +1,14 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
+  "version": 2,
+  "functions": {
+    "server.js": {
+      "includeFiles": "**"
+    }
+  },
+  "routes": [
     {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/login.php",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/register",
-      "destination": "/register.html"
-    },
-    {
-      "source": "/register.php",
-      "destination": "/register.html"
-    },
-    {
-      "source": "/game",
-      "destination": "/game.html"
-    },
-    {
-      "source": "/game.php",
-      "destination": "/game.html"
-    },
-    {
-      "source": "/logout",
-      "destination": "/api/logout"
-    },
-    {
-      "source": "/logout.php",
-      "destination": "/api/logout"
+      "src": "/(.*)",
+      "dest": "server.js"
     }
   ]
 }
