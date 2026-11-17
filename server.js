@@ -54,24 +54,42 @@ function findFile(relPath) {
   return null;
 }
 
-const server = http.createServer(async (req, res) => {
+// Master Handler for both Vercel Serverless and local HTTP
+async function handler(req, res) {
   const parsedUrl = url.parse(req.url, true);
   let pathname = parsedUrl.pathname;
 
   // Response helpers
-  res.status = function (code) {
-    res.statusCode = code;
-    return res;
-  };
-  res.json = function (obj) {
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.end(JSON.stringify(obj));
-  };
+  if (!res.status) {
+    res.status = function (code) {
+      res.statusCode = code;
+      return res;
+    };
+  }
+  if (!res.json) {
+    res.json = function (obj) {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.end(JSON.stringify(obj));
+    };
+  }
 
   req.query = parsedUrl.query;
 
   // API endpoints
   if (apiRoutes[pathname]) {
+    // If body is already parsed by Vercel or middleware
+    if (req.body) {
+      try {
+        await apiRoutes[pathname](req, res);
+      } catch (err) {
+        console.error('API Error:', err);
+        if (!res.writableEnded) {
+          res.status(500).json({ success: false, error: 'Internal Server Error' });
+        }
+      }
+      return;
+    }
+
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -126,10 +144,15 @@ const server = http.createServer(async (req, res) => {
       res.end('<h1>404 Not Found</h1>');
     }
   }
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`🕵️ The Detective's Desk running on port ${PORT}`);
-});
+// Local dev mode
+if (require.main === module) {
+  const server = http.createServer(handler);
+  server.listen(PORT, () => {
+    console.log(`🕵️ The Detective's Desk running on port ${PORT}`);
+  });
+}
 
-module.exports = server;
+// Export function handler for Vercel
+module.exports = handler;
