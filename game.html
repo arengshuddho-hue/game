@@ -157,7 +157,9 @@
   <script>
     (async function checkAuth() {
       try {
-        const res = await fetch('/api/me');
+        const token = localStorage.getItem('detective_jwt');
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+        const res = await fetch('/api/me', { headers });
         if (res.ok) {
           const data = await res.json();
           if (data.authenticated && data.user) {
